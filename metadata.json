@@ -1,0 +1,6 @@
+{
+  "name": "Aegis Disaster Warning",
+  "description": "AI Disaster Detection & Early Warning System monitoring floods, wildfires, cyclones, and managing emergency response.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
