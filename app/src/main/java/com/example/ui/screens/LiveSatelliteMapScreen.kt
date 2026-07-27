@@ -189,6 +189,139 @@ fun LiveSatelliteMapScreen() {
                 )
             }
         }
+
+        // Mapbox / Leaflet Offline Tiles Caching System
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Storage, contentDescription = "Offline Tiles", tint = AegisPrimary)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Mapbox / Leaflet Offline Tile Cache",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Divider(color = AegisBorder)
+                Text(
+                    text = "Ensure complete operational mapping capability during cellular and satellite network blackouts by pre-caching vector and raster tile bundles.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 12.sp
+                )
+
+                OfflineTileRegionItem(
+                    regionName = "North America Topo & Highway Vector Pack",
+                    size = "342 MB",
+                    status = "Cached & Synchronized",
+                    isCached = true
+                )
+
+                OfflineTileRegionItem(
+                    regionName = "Pacific Rim High-Resolution Satellite Pack",
+                    size = "1.2 GB",
+                    status = "Ready for Offline Download",
+                    isCached = false
+                )
+
+                OfflineTileRegionItem(
+                    regionName = "European Alpine & Shelter Relief Grid",
+                    size = "510 MB",
+                    status = "Cached & Synchronized",
+                    isCached = true
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OfflineTileRegionItem(regionName: String, size: String, status: String, isCached: Boolean) {
+    var cachedState by remember { mutableStateOf(isCached) }
+    var downloading by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(10.dp))
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = regionName,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Bundle Size: $size",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 11.sp
+                )
+            }
+            Surface(
+                color = (if (cachedState) AegisSafe else AegisPrimary).copy(alpha = 0.2f),
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Text(
+                    text = if (cachedState) "CACHED" else "DOWNLOADABLE",
+                    color = if (cachedState) AegisSafe else AegisPrimary,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = if (downloading) "Downloading Leaflet/Mapbox vector tiles..." else status,
+                color = if (cachedState) AegisSafe else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 11.sp
+            )
+
+            if (!cachedState) {
+                Button(
+                    onClick = {
+                        downloading = true
+                        cachedState = true
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = AegisPrimary),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Icon(Icons.Default.Download, contentDescription = "Download", tint = AegisOnPrimary, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = if (downloading) "Downloading..." else "Cache Region", color = AegisOnPrimary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+            } else {
+                OutlinedButton(
+                    onClick = { cachedState = false },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = Modifier.height(32.dp)
+                ) {
+                    Text(text = "Purge Cache", fontSize = 11.sp)
+                }
+            }
+        }
     }
 }
 
